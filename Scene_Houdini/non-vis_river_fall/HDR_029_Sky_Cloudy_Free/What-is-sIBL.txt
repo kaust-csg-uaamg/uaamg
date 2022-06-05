@@ -1,0 +1,16 @@
+What is sIBL?
+sIBL is a short name for Smart Image Based Lighting. In short it is a toolset for organizing your hdri environments and is a single click preset solution to setup your scene with photo realistic lighting.
+It works with most major 3D programs like Lightwave, 3ds MAX, Maya, Modo and XSI.
+
+
+What's in the package? Every sIBL set that is available in the online store contains:
+- Full high resolution spherical JPEG background
+- Half resolution spherical HDR for reflection and refraction
+- Lowres (512 x 256 pixels) blurred lightmap
+- Thumbnail JPG (128 x 128 pixels)
+- Preview image (600 x 300 pixels)
+- The sIBL description file
+
+
+More sIBL information: http://www.hdrlabs.com/sibl/index.html
+The sIBL applications: http://www.hdrlabs.com/sibl/software.html

@@ -1,0 +1,44 @@
+---
+## output dir
+output_prefix: "output"
+time_step: 0.041666
+simulation_time: 10
+
+radius:  1
+init_vel_x: 0
+init_vel_y: 0
+init_vel_z: 0
+
+obj-pos-x: 0
+obj-pos-y: 0
+obj-pos-z: 0
+
+FLIP_domain_collision: true
+FLIP_domain_solid: false
+FLIP_solid_friction: 0.0
+FLIPCFL: 2
+FLIP_min_step_num: 1
+FLIP_max_step_num: 10
+
+pressure_acc: 1e-5
+viscosity_acc: 1e-3
+
+FLIPpool-minx: -1.5
+FLIPpool-miny: -0
+FLIPpool-minz: -1.5
+FLIPpool-maxx: 1.5
+FLIPpool-maxy: 6
+FLIPpool-maxz: 1.5
+FLIPdx:  0.005
+
+enable_viscosity: true
+viscosity_coef: 2000
+#solids_vdb 
+#solids_vel_vdb
+source_vdb: "box_of_liquid.vdb"
+#source_vel_vdb
+
+dynamic_obj_enabled: true
+dynamic_obj_folder: "dynamic_geo_f5"
+dynamic_obj_prefix: "turbine_blade."
+

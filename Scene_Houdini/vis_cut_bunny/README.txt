@@ -1,0 +1,2 @@
+use Houdini and cut_bunny_generate_scene_and_Houdini_sim.hipnc to generate the simulation geometry
+render with cut_bunny_scene_render

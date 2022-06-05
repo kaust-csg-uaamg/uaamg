@@ -1,0 +1,46 @@
+---
+## Options: pressure/viscosity
+equation_type: "viscosity"
+
+nx: 256
+
+output_prefix: './benchmark'
+
+##################################################################################
+## below settings for pressure setup
+
+## Options: sparse/compact
+poisson_scene_type: sparse
+
+## pressure_solver_method
+## Options:
+# 0: Eigen diagonal PCG
+# 1: Eigen ICPCG
+# 2: Batty ICPCG
+# 3: unsmooth aggregation AMG PCG
+# 4: SIMD UAAMG PCG
+pressure_solver_method: 3
+
+## pressure_smoother, applicable for pressure_solver_method 3 & 4
+## Options:
+# 0: damped jacobi
+# 1: Scheduled Relaxed Jacobi
+# 2: Red Black Gauss Seidel
+pressure_smoother: 2
+
+## control sparse scene
+nballs: 1000
+resizer: 0.3
+
+##################################################################################
+# below settings for viscosity setup
+## viscosity_solver_method
+## Options:
+# 0: Eigen diagonal PCG
+# 1: Eigen ICPCG
+# 2: Batty ICPCG
+# 3: unsmooth aggregation AMG PCG
+# 4: SIMD UAAMG PCG
+viscosity_solver_method: 3
+
+viscosity_coef: 10000

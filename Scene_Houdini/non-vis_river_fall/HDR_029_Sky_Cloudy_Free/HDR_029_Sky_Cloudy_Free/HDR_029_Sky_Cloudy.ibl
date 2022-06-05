@@ -1,0 +1,44 @@
+[Header]
+ICOfile = "HDR_029_Sky_Cloudy_Thumb.tga"
+Name = "HDR 029 Sky Cloudy Free"
+Author = "HDRI Hub"
+Location = "Schwerin, Germany"
+Comment = "sunset, dawn, clouds, field"
+PREVIEWfile = "HDR_029_Sky_Cloudy_Prev.tga"
+GEOlat = 53.2459527254104610
+GEOlong = 11.6064360737800600
+Link = "http://www.hdri-hub.com"
+Date = "2011:08:20"
+Time = "16:50:40"
+
+[Background]
+BGfile = "HDR_029_Sky_Cloudy_Bg.jpg"
+BGmap = 1
+BGu = 0.000000
+BGv = 0.000000
+BGheight = 2048
+
+[Enviroment]
+EVfile = "HDR_029_Sky_Cloudy_Env.hdr"
+EVmap = 1
+EVu = 0.000000
+EVv = 0.000000
+EVheight = 256
+EVmulti = 0.701754
+EVgamma = 1.000000
+
+[Reflection]
+REFfile = "HDR_029_Sky_Cloudy_Ref.hdr"
+REFmap = 1
+REFu = 0.000000
+REFv = 0.000000
+REFheight = 1536
+REFmulti = 0.701754
+REFgamma = 1.000000
+
+[Sun]
+SUNcolor = 254,238,218
+SUNmulti = 0.964224
+SUNu = 0.522000
+SUNv = 0.292000
+

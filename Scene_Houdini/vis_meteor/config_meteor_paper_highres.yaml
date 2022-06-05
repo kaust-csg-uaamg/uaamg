@@ -1,0 +1,40 @@
+---
+## output dir
+output_prefix: "output"
+time_step: 0.041666
+simulation_time: 15
+
+init_vel_x: 0
+init_vel_y: 0
+init_vel_z: 0
+
+
+FLIP_domain_collision: false
+FLIP_domain_solid: false
+FLIP_solid_friction: 0.0
+FLIPCFL: 1
+FLIP_min_step_num: 1
+FLIP_max_step_num: 10
+
+pressure_acc: 1e-4
+viscosity_acc: 1e-3
+
+FLIPpool-minx: -35
+FLIPpool-miny: -1
+FLIPpool-minz: -35
+FLIPpool-maxx: 35
+FLIPpool-maxy: 30
+FLIPpool-maxz: 35
+FLIPdx:  0.05
+
+enable_viscosity: true
+viscosity_coef: 5000
+solids_vdb: "container.vdb"
+#solids_vel_vdb
+source_vdb: "source.vdb"
+#source_vel_vdb
+
+dynamic_obj_enabled: true
+dynamic_obj_folder: "meteor_dynamic_from_paper"
+dynamic_obj_prefix: "meteor_dynamics."
+

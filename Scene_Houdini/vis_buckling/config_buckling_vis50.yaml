@@ -1,0 +1,39 @@
+---
+## output dir
+output_prefix: "output_vis50"
+time_step: 0.016666
+simulation_time: 10
+
+init_vel_x: 0
+init_vel_y: 0
+init_vel_z: 0
+
+FLIP_domain_collision: true
+FLIP_domain_solid: false
+FLIP_solid_friction: 0.0
+FLIPCFL: 3
+FLIP_min_step_num: 1
+FLIP_max_step_num: 10
+
+pressure_acc: 1e-4
+viscosity_acc: 1e-3
+
+FLIPpool-minx: -0.1
+FLIPpool-miny: -0
+FLIPpool-minz: -0.1
+FLIPpool-maxx: 0.1
+FLIPpool-maxy: 0.5
+FLIPpool-maxz: 0.1
+FLIPdx:  0.0005
+
+enable_viscosity: true
+viscosity_coef: 50
+#solids_vdb: "container.vdb"
+#solids_vel_vdb
+source_vdb: "sphere_source.vdb"
+#source_vel_vdb
+
+dynamic_obj_enabled: false
+dynamic_obj_folder: ""
+dynamic_obj_prefix: ""
+
