@@ -1,1 +1,0 @@
-SIMD_UAAMG-- Single Instruction Multiple Data Unsmooth Aggregation Algebraic Multigrid
