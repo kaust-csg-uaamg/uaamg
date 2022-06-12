@@ -9,7 +9,6 @@
 #include "YamlSingleton.h"
 #include "FLIP_vdb.h"
 #include "pcgsolver/pcg_solver.h"
-#include "Tracy.hpp"
 #include <filesystem>
 #include "Timer.h"
 
@@ -585,7 +584,6 @@ struct restriction_triplet_reducer {
 
 
 void Eigen_Jacobi_apply(Eigen::VectorXf& out_result, Eigen::VectorXf& in_lhs, Eigen::VectorXf& in_rhs, const Eigen::SparseMatrix<float, Eigen::RowMajor>& LHS, float omega) {
-	ZoneScoped
 	int ndof = LHS.rows();
 
 	tbb::parallel_for(0, ndof, [&](int i) {
@@ -615,7 +613,7 @@ void Eigen_Jacobi_apply(Eigen::VectorXf& out_result, Eigen::VectorXf& in_lhs, Ei
 }
 
 void Eigen_SPAI0_apply(Eigen::VectorXf& out_result, Eigen::VectorXf& in_lhs, Eigen::VectorXf& in_rhs, const Eigen::SparseMatrix<float, Eigen::RowMajor>& LHS) {
-	ZoneScoped
+	
 	int ndof = LHS.rows();
 
 	//Eigen::VectorXf spai0_m = Eigen::VectorXf::Zero(ndof);
@@ -648,7 +646,7 @@ void Eigen_SPAI0_apply(Eigen::VectorXf& out_result, Eigen::VectorXf& in_lhs, Eig
 }
 
 void Eigen_residual_apply(Eigen::VectorXf& out_result, Eigen::VectorXf& in_lhs, Eigen::VectorXf& in_rhs, const Eigen::SparseMatrix<float, Eigen::RowMajor>& LHS) {
-	ZoneScoped
+	
 		int ndof = LHS.rows();
 
 	tbb::parallel_for(0, ndof, [&](int i) {
@@ -669,7 +667,6 @@ void Eigen_residual_apply(Eigen::VectorXf& out_result, Eigen::VectorXf& in_lhs, 
 
 template <bool forward>
 void Eigen_RBGS_apply(Eigen::VectorXf& in_out_lhs, Eigen::VectorXf& in_rhs, const std::vector<int>& color_update_mask, const Eigen::SparseMatrix<float, Eigen::RowMajor>& LHS, float omega, int ncolor) {
-	ZoneScoped;
 	int ndof = LHS.rows();
 
 	//red update pass
@@ -682,22 +679,6 @@ void Eigen_RBGS_apply(Eigen::VectorXf& in_out_lhs, Eigen::VectorXf& in_rhs, cons
 			if (actual_color != color_update_mask[i]) {
 				return;
 			}
-
-			//float diagonal = 1.0f;
-			//float result0 = 0.f;
-			//for (Eigen::SparseMatrix<float, Eigen::RowMajor>::InnerIterator it(LHS, i); it; ++it) {
-			//	result0 += in_out_lhs[it.col()] * it.value();
-			//	
-			//	if (it.col() == i) {
-			//		diagonal = it.value();
-			//	}
-			//}
-
-			//float residual = in_rhs[i] - result0;
-			//if (diagonal != 0.f) {
-			//	residual = residual / diagonal;
-			//	in_out_lhs[i] = in_out_lhs[i] + residual * omega;
-			//}
 
 			float diagonal = 0.0f;
 			float off_diag_result = 0.f;
@@ -765,7 +746,7 @@ struct explicit_PCG_solver {
 	}
 
 	void mucycle_preconditioner(Eigen::VectorXf& in_out_lhs, const Eigen::VectorXf& in_rhs, const int level, const int n, const int mu_time) {
-		ZoneScoped;
+		;
 		auto get_scheduled_weight = [n](int iteration) {
 			std::array<float, 3> scheduled_weight;
 			if (iteration >= n) {
@@ -826,7 +807,6 @@ struct explicit_PCG_solver {
 
 		int child_level = level + 1;
 		{
-			ZoneNamedN(restriction, "restriction", true);
 			m_mucycle_rhss[child_level] = m_restriction_matrix[level] * m_mucycle_temps[level];
 		}
 		
@@ -838,7 +818,6 @@ struct explicit_PCG_solver {
 		}
 
 		{
-			ZoneNamedN(prolongation, "prolongation", true);
 			m_mucycle_lhss[level] += m_prolongation_matrix[level] * m_mucycle_lhss[child_level];
 		}
 		
@@ -870,7 +849,7 @@ struct explicit_PCG_solver {
 
 	float abs_max(const Eigen::VectorXf& x)
 	{
-		ZoneScoped;
+		;
 		size_t n = x.size();
 		//return cblas_idamax((int)x.size(), &x[0], 1); 
 		return tbb::parallel_reduce(
@@ -897,7 +876,7 @@ struct explicit_PCG_solver {
 
 	float dot(const Eigen::VectorXf& x, const Eigen::VectorXf& y)
 	{
-		ZoneScoped;
+		;
 		size_t n = x.size();
 		//return cblas_ddot((int)x.size(), &x[0], 1, &y[0], 1); 
 		return tbb::parallel_reduce(
@@ -921,7 +900,7 @@ struct explicit_PCG_solver {
 
 	int pcg_solve(Eigen::VectorXf& in_out_presssure, Eigen::VectorXf& in_rhs)
 	{
-		ZoneScoped;
+		;
 		m_iteration = 0;
 
 		//according to mcadams algorithm 3
@@ -948,7 +927,6 @@ struct explicit_PCG_solver {
 		for (; m_iteration < m_max_iter; m_iteration++) {
 			//line6
 			{
-				ZoneNamedN(matrixMul,"matrixMul", true);
 				z = m_LHS_matrix[0] * p;
 			}
 			float sigma = dot(p, z);
@@ -957,7 +935,6 @@ struct explicit_PCG_solver {
 			//printf("alpha%e \n", alpha);
 			//line8
 			{
-				ZoneNamedN(updateR, "updateR", true);
 				r -= alpha * z;
 			}
 			
@@ -983,7 +960,6 @@ struct explicit_PCG_solver {
 			rho = rho_new;
 			//line16
 			{
-				ZoneNamedN(update, "update", true);
 				in_out_presssure += alpha * p;
 				p = z + beta * p;
 			}
@@ -1453,7 +1429,7 @@ void solve_viscosity_amgcl(packed_FloatGrid3 in_rhs,
 		CSim::TimerMan::timer("Benchmark/solve/solve").stop();
 	}
 	else {
-		printf("selected smoothing method not implemented\n");
+		printf("selected smoothing method not implemented. Support smoother: 0 and 3\n");
 		exit(0);
 	}
 }
@@ -1664,23 +1640,19 @@ void benchmark_viscosity() {
 		solve_viscosity_Eigen_diagonalPCG(rhs, init_guess, simdsolver.m_matrix_levels[0].get());
 		break;
 	case 1:
-		//Eigen ICPCG
-		//solve_viscosity_Eigen_ICPCG(rhs, init_guess, level0);
-		break;
-	case 2:
 		//Batty ICPCG
 		solve_viscosity_Batty_ICPCG(rhs, init_guess, simdsolver.m_matrix_levels[0].get());
 		break;
-	case 3:
+	case 2:
 		//UAAMG
 		solve_viscosity_UAAMG(init_guess, simdsolver);
 		break;
-	case 4:
+	case 3:
 	default:
 		//SIMD-UAAMG
 		simdsolver.pcg_solve(init_guess, 1e-7);
 		break;
-	case 5:
+	case 4:
 		//AMGCL
 		solve_viscosity_amgcl(rhs, init_guess, simdsolver.m_matrix_levels[0].get());
 		break;

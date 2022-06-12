@@ -14,10 +14,6 @@
 #include "Timer.h"
 #include "vdb_SIMD_IO.h"
 
-//profiling
-#include "Tracy.hpp"
-#include "TracyC.h"
-
 namespace simd_uaamg {
 
 struct BuildPoissonRhs {

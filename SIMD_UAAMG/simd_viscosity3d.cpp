@@ -8,7 +8,6 @@
 #include "openvdb/tools/Morphology.h"
 #include "openvdb/tools/Interpolation.h"
 #include "volume_fractions.h"
-#include "Tracy.hpp"
 
 namespace simd_uaamg{
 
@@ -2156,7 +2155,7 @@ void L_with_level::write_to_FloatGrid3_assume_topology(packed_FloatGrid3 out_gri
 
 packed_FloatGrid3 L_with_level::get_zero_vec() const
 {
-	ZoneScoped;
+	
 	packed_FloatGrid3 result;
 	for (int i = 0; i < 3; i++) {
 		result.v[i] = openvdb::FloatGrid::create();
@@ -2208,28 +2207,28 @@ void L_with_level::run(light_weight_applier& Op)
 
 void L_with_level::L_apply(packed_FloatGrid3 out_result, packed_FloatGrid3 in_lhs)
 {
-	ZoneScoped;
+	
 	auto Op = get_light_weight_applier(out_result, in_lhs, out_result, working_mode::NORMAL);
 	run(Op);
 }
 
 void L_with_level::residual_apply(packed_FloatGrid3 out_residual, packed_FloatGrid3 in_lhs, packed_FloatGrid3 in_rhs)
 {
-	ZoneScoped;
+	
 	auto Op = get_light_weight_applier(out_residual, in_lhs, in_rhs, working_mode::RESIDUAL);
 	run(Op);
 }
 
 void L_with_level::Jacobi_apply(packed_FloatGrid3 out_updated_lhs, packed_FloatGrid3 in_lhs, packed_FloatGrid3 in_rhs)
 {
-	ZoneScoped;
+	
 	auto Op = get_light_weight_applier(out_updated_lhs, in_lhs, in_rhs, working_mode::JACOBI);
 	run(Op);
 }
 
 void L_with_level::SPAI0_apply(packed_FloatGrid3 out_updated_lhs, packed_FloatGrid3 in_lhs, packed_FloatGrid3 in_rhs)
 {
-	ZoneScoped;
+	
 	build_SPAI0_matrix();
 	auto Op = get_light_weight_applier(out_updated_lhs, in_lhs, in_rhs, working_mode::SPAI0);
 	run(Op);
@@ -2238,7 +2237,7 @@ void L_with_level::SPAI0_apply(packed_FloatGrid3 out_updated_lhs, packed_FloatGr
 
 void L_with_level::XYZ_RBGS_apply(packed_FloatGrid3 dummy, packed_FloatGrid3 in_lhs, packed_FloatGrid3 in_rhs)
 {
-	ZoneScoped;
+	
 	auto Op = get_light_weight_applier(in_lhs, in_lhs, in_rhs, working_mode::RED_GS);
 	Op.set_channel(0);
 	m_dof_manager[0]->foreach(Op);
@@ -2271,7 +2270,7 @@ void L_with_level::XYZ_RBGS_apply(packed_FloatGrid3 dummy, packed_FloatGrid3 in_
 
 void L_with_level::ZYX_RBGS_apply(packed_FloatGrid3 dummy, packed_FloatGrid3 in_lhs, packed_FloatGrid3 in_rhs)
 {
-	ZoneScoped;
+	
 	auto Op = get_light_weight_applier(in_lhs, in_lhs, in_rhs, working_mode::BLACK_GS);
 	Op.set_channel(2);
 	m_dof_manager[2]->foreach(Op);
@@ -2304,7 +2303,7 @@ void L_with_level::ZYX_RBGS_apply(packed_FloatGrid3 dummy, packed_FloatGrid3 in_
 
 void L_with_level::set_grid_to_zero(packed_FloatGrid3 in_out_result)
 {
-	ZoneScoped;
+	
 	for (int i = 0; i < 3; i++) {
 		auto zero_filler = [&](openvdb::Int32Tree::LeafNodeType& leaf, openvdb::Index) {
 			auto result_leaf = in_out_result.v[i]->tree().probeLeaf(leaf.origin());
@@ -2353,7 +2352,7 @@ void L_with_level::set_grid_to_SPAI0_after_first_iteration(packed_FloatGrid3 out
 
 void L_with_level::restriction(packed_FloatGrid3 out_coarse_grid, packed_FloatGrid3 in_fine_grid, const L_with_level& parent)
 {
-	ZoneScoped;
+	
 	for (int i = 0; i < 3; i++) {
 		//to be use by the dof idx manager at coarse level, the parent level
 		auto collect_from_fine = [&](openvdb::Int32Tree::LeafNodeType& leaf, openvdb::Index) {
@@ -2660,7 +2659,7 @@ void L_with_level::solve_exact(packed_FloatGrid3 in_out_lhs, packed_FloatGrid3 i
 template<bool inplace_add>
 void L_with_level::prolongation(packed_FloatGrid3 out_fine_grid, packed_FloatGrid3 in_coarse_grid)
 {
-	ZoneScoped;
+	
 	for (int i = 0; i < 3; i++) {
 		//to be use by the dof idx manager at coarse level, the parent level
 		auto scatter_to_fine = [&](openvdb::Int32Tree::LeafNodeType& leaf, openvdb::Index) {
@@ -3691,7 +3690,7 @@ simd_viscosity3d::simd_viscosity3d(L_with_level::Ptr level0,
 
 void simd_viscosity3d::pcg_solve(packed_FloatGrid3 in_lhs, float tolerance)
 {
-	ZoneScoped;
+	
 	auto& level0 = *m_matrix_levels[0];
 
 	m_iteration = 0;
@@ -3756,7 +3755,7 @@ void simd_viscosity3d::pcg_solve(packed_FloatGrid3 in_lhs, float tolerance)
 
 float simd_viscosity3d::lv_abs_max(packed_FloatGrid3 in_grid, int level)
 {
-	ZoneScoped;
+	
 	float result = 0;
 	for (int i = 0; i < 3; i++) {
 		auto op{ grid_abs_max_op(in_grid.v[i]) };
@@ -3769,7 +3768,7 @@ float simd_viscosity3d::lv_abs_max(packed_FloatGrid3 in_grid, int level)
 
 float simd_viscosity3d::lv_dot(packed_FloatGrid3 a, packed_FloatGrid3 b, int level)
 {
-	ZoneScoped;
+	
 	float result = 0;
 	for (int i = 0; i < 3; i++) {
 		auto op{ grid_dot_op{ a.v[i], b.v[i]} };
@@ -3782,7 +3781,7 @@ float simd_viscosity3d::lv_dot(packed_FloatGrid3 a, packed_FloatGrid3 b, int lev
 
 void simd_viscosity3d::lv_axpy(const float alpha, packed_FloatGrid3 x, packed_FloatGrid3 y, int level)
 {
-	ZoneScoped;
+	
 	for (int i = 0; i < 3; i++) {
 		//y = a*x + y
 		auto add_op = [&](openvdb::Int32Tree::LeafNodeType& leaf, openvdb::Index) {
@@ -3802,7 +3801,7 @@ void simd_viscosity3d::lv_axpy(const float alpha, packed_FloatGrid3 x, packed_Fl
 
 void simd_viscosity3d::lv_xpay(const float alpha, packed_FloatGrid3 x, packed_FloatGrid3 y, int level)
 {
-	ZoneScoped;
+	
 	for (int i = 0; i < 3; i++) {
 		//y = x + a*y
 		auto add_op = [&](openvdb::Int32Tree::LeafNodeType& leaf, openvdb::Index) {
@@ -3822,7 +3821,7 @@ void simd_viscosity3d::lv_xpay(const float alpha, packed_FloatGrid3 x, packed_Fl
 
 void simd_viscosity3d::lv_copyval(packed_FloatGrid3 out_grid, packed_FloatGrid3 in_grid, int level)
 {
-	ZoneScoped;
+	
 	for (int i = 0; i < 3; i++) {
 		//it is assumed that the 
 		auto copy_op = [&](openvdb::Int32Tree::LeafNodeType& leaf, openvdb::Index ) {
@@ -3838,7 +3837,7 @@ void simd_viscosity3d::lv_copyval(packed_FloatGrid3 out_grid, packed_FloatGrid3 
 void simd_viscosity3d::mucycle(
 	packed_FloatGrid3 in_out_lhs, const packed_FloatGrid3 in_rhs, const int mu_time, const bool for_precon, const int level, int n)
 {
-	ZoneScoped;
+	
 	static int iter = 0;
 	int n1 = n;
 	int n2 = n;

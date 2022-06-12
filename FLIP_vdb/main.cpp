@@ -6,7 +6,6 @@
 #endif
 #include "tbb/tbbmalloc_proxy.h"
 #include "FLIP_vdb.h"
-#include "Tracy.hpp"
 #include "YamlSingleton.h"
 #include "openvdb/tools/MeshToVolume.h"
 #include "openvdb/tools/LevelSetSphere.h"
@@ -406,7 +405,6 @@ int main(int argc, char* argv[]) {
         for (auto& t : iothreads) {
             t.join();
         }
-        FrameMark;
     }
 
     std::stringstream output_dir_ss;

@@ -27,8 +27,6 @@
 
 #include "Timer.h"
 
-//Tracy profiler
-#include "Tracy.hpp"
 
 template <typename T>
 using allocator_type = tbb::tbb_allocator<T>;
@@ -1179,7 +1177,7 @@ void Compressed_FLIP_Object_OpenVDB::narrow_band_particles(openvdb::points::Poin
 	openvdb::FloatGrid::Ptr out_interior_sdf,
 	openvdb::points::PointDataGrid::Ptr in_particles, int nlayer)
 {
-	ZoneScoped;
+	
 	//particles are stored in particle voxels
 	//1 dilate particle voxels and mark existing part as inactive to get the surface mask
 	//2 dilate the surface mask nlayer-1 to get the erosion mask
@@ -1399,7 +1397,7 @@ void FLIP_Solver_OpenVDB::custom_move_points_and_set_flip_vel(
 	openvdb::Vec3fGrid::Ptr in_solid_vel,
 	float PIC_component, float dt, int RK_order)
 {
-	ZoneScoped;
+	
 	if (!in_out_points) {
 		return;
 	}
@@ -1880,7 +1878,7 @@ FLIP_Solver_OpenVDB::SolverParameters::SolverParameters()
 
 void FLIP_Solver_OpenVDB::particle_to_grid(packed_FloatGrid3 out_velocity, openvdb::FloatGrid::Ptr out_liquid_sdf, openvdb::points::PointDataGrid::Ptr in_particles, const float in_particle_radius)
 {
-	ZoneScoped;
+	
 	//allocate the tree for transfered velocity and liquid phi
 	auto unweignted_velocity = openvdb::Vec3fGrid::create();
 	unweignted_velocity->setTransform(in_particles->transformPtr());
@@ -2174,7 +2172,7 @@ void FLIP_Solver_OpenVDB::substep_advection_projection(FLIP_Object_OpenVDB& in_o
 {
 	m_substep_statistics.init();
 	using duration_type = std::chrono::duration<double>;
-	ZoneScoped;
+	
 	CSim::TimerMan::timer("Step").start();
 	//set collision geometry
 	CSim::TimerMan::timer("Step/update_solid_sdf").start();
@@ -2271,7 +2269,7 @@ void FLIP_Solver_OpenVDB::substep_advection_projection(FLIP_Object_OpenVDB& in_o
 
 void FLIP_Solver_OpenVDB::substep_advection_reflection_order1(FLIP_Object_OpenVDB& in_out_object, float substep_dt)
 {
-	ZoneScoped;
+	
 	CSim::TimerMan::timer("Step").start();
 	//split the sub_step into two steps
 	float halfdt = substep_dt / 2;
@@ -2544,7 +2542,7 @@ void FLIP_Solver_OpenVDB::substep_advection_projection_with_viscosity(FLIP_Objec
 
 void FLIP_Solver_OpenVDB::apply_body_force(float in_dt)
 {
-	ZoneScoped;
+	
 	openvdb::Vec3f body_f = m_solver_parameters.gravity;
 
 	for (int channel = 0; channel < 3; channel++) {
@@ -2659,7 +2657,7 @@ void FLIP_Solver_OpenVDB::apply_pressure_gradient(float in_dt, bool reflection)
 
 void FLIP_Solver_OpenVDB::calculate_face_weights()
 {
-	ZoneScoped;
+	
 	m_face_weight = openvdb::Vec3fGrid::create(openvdb::Vec3f{ 1.0f });
 	m_face_weight->setTree(std::make_shared<openvdb::Vec3fTree>(
 		m_liquid_sdf->tree(), openvdb::Vec3f{ 1.0f }, openvdb::TopologyCopy()));
@@ -2744,7 +2742,7 @@ void FLIP_Solver_OpenVDB::calculate_face_weights()
 
 void FLIP_Solver_OpenVDB::extrapolate_velocity(int layer)
 {
-	ZoneScoped;
+	
 	vdb_velocity_extrapolator::union_extrapolate(layer,
 		m_packed_velocity.v[0],
 		m_packed_velocity.v[1],
@@ -2846,7 +2844,7 @@ float FLIP_Solver_OpenVDB::particle_cfl(openvdb::points::PointDataGrid::Ptr in_p
 
 void FLIP_Solver_OpenVDB::immerse_liquid_phi_in_solids()
 {
-	ZoneScoped;
+	
 
 	auto correct_liquid_phi_in_solid = [&](openvdb::FloatTree::LeafNodeType& leaf, openvdb::Index leafpos) {
 		//detech if there is solid
@@ -2935,7 +2933,7 @@ void FLIP_Solver_OpenVDB::immerse_liquid_phi_in_solids()
 //remove all particles inside solids, in sink zone, and outside of the bounding box
 void FLIP_Solver_OpenVDB::sink_liquid(openvdb::points::PointDataGrid::Ptr in_out_particles, const std::vector<openvdb::FloatGrid::Ptr>& in_sdfs)
 {
-	ZoneScoped;
+	
 
 	auto partman = openvdb::tree::LeafManager<openvdb::points::PointDataTree>(in_out_particles->tree());
 
@@ -3109,7 +3107,7 @@ void FLIP_Solver_OpenVDB::sink_liquid(openvdb::points::PointDataGrid::Ptr in_out
 void FLIP_Solver_OpenVDB::solve_pressure_simd(float in_dt, bool reflection)
 {
 	using duration_type = std::chrono::duration<double>;
-	ZoneScoped;
+	
 	//skip if there is no dof to solve
 	if (m_liquid_sdf->tree().leafCount() == 0) {
 		return;
@@ -3212,7 +3210,7 @@ void FLIP_Solver_OpenVDB::solve_viscosity(FLIP_Object_OpenVDB& in_out_object, fl
 
 void FLIP_Solver_OpenVDB::update_solid_sdf_vel(openvdb::points::PointDataGrid::Ptr in_out_particles, const std::vector<sdf_vel_pair>& in_sdf_vels)
 {
-	ZoneScoped;
+	
 	using  namespace openvdb::tools::local_util;
 	//solid is only required where particles present
 	//derive it from particles, by default the space is outside of solid, so it's positive

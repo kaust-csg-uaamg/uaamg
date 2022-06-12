@@ -2,7 +2,7 @@
 ## Options: pressure/viscosity
 equation_type: "viscosity"
 
-nx: 256
+nx: 128
 
 output_prefix: './benchmark'
 
@@ -10,7 +10,7 @@ output_prefix: './benchmark'
 ## below settings for pressure setup
 
 ## Options: sparse/compact
-poisson_scene_type: sparse
+poisson_scene_type: compact
 
 ## pressure_solver_method
 ## Options:
@@ -19,13 +19,15 @@ poisson_scene_type: sparse
 # 2: Batty ICPCG
 # 3: unsmooth aggregation AMG PCG
 # 4: SIMD UAAMG PCG
-pressure_solver_method: 3
+# 5: AMGCL
+pressure_solver_method: 4
 
 ## pressure_smoother, applicable for pressure_solver_method 3 & 4
 ## Options:
 # 0: damped jacobi
 # 1: Scheduled Relaxed Jacobi
 # 2: Red Black Gauss Seidel
+# 3： SPAI0
 pressure_smoother: 2
 
 ## control sparse scene
@@ -37,10 +39,18 @@ resizer: 0.3
 ## viscosity_solver_method
 ## Options:
 # 0: Eigen diagonal PCG
-# 1: Eigen ICPCG
-# 2: Batty ICPCG
-# 3: unsmooth aggregation AMG PCG
-# 4: SIMD UAAMG PCG
+# 1: Batty ICPCG
+# 2: unsmooth aggregation AMG PCG
+# 3: SIMD UAAMG PCG
+# 4: AMGCL
 viscosity_solver_method: 3
+
+# viscosity solver smoother, applicable for viscosity_solver_method = 3
+# Only 2 multicolor Gauss Seidel converges.
+# 0: Damped Jacobi
+# 1: Scheduled Relaxed Jacobi designed for Poisson
+# 2: Multi Color Gauss Seidel
+# 3: SPAI0 
+viscosity_smoother: 2
 
 viscosity_coef: 10000
