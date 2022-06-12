@@ -1,1 +1,0 @@
-1. generate water source geometry and riverbed collision geometry with "water_fall_generate_scene.hipnc" in Houdini

@@ -1,3 +1,0 @@
-1. run simulation with any of the config files
-2. visualize the result with "buckling.hipnc"
-It is also possible to change the liquid source geometry in Houdini.
