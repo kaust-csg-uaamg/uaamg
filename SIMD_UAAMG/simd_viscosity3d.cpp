@@ -2620,7 +2620,7 @@ void L_with_level::get_triplets(std::vector<Eigen::Triplet<float>>& triplets)
 	for (int i = 0; i < 3; i++) {
 		std::vector<const openvdb::Int32Tree::LeafNodeType*> dof_leaves;
 		dof_leaves.reserve(m_dof_manager[i]->leafCount());
-		m_dof_manager[i]->getNodes(dof_leaves);
+		m_velocity_DOF.idx[i]->tree().getNodes(dof_leaves);
 
 		explicit_matrix_reducer reducer(
 			dof_leaves,

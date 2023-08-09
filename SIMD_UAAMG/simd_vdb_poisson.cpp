@@ -197,7 +197,7 @@ void LaplacianWithLevel::getTriplets(std::vector<Eigen::Triplet<float>>& outTrip
 {
     std::vector<openvdb::Int32Tree::LeafNodeType*> dofLeaves;
     dofLeaves.reserve(mDofLeafManager->tree().leafCount());
-    mDofLeafManager->getNodes(dofLeaves);
+    mDofIndex->tree().getNodes(dofLeaves);
     size_t nleaves = dofLeaves.size();
 
     LaplacianTripletsReducer reducer(this, dofLeaves);
@@ -1196,7 +1196,7 @@ struct alignas(32) LaplacianApplySIMD {
         std::unordered_map<const openvdb::Int32Tree::LeafNodeType*, size_t> leafPtrToLeafposMap;
         std::vector<openvdb::Int32Tree::LeafNodeType*> dofLeafPtrs;
         dofLeafPtrs.reserve(nLeaf);
-        mDofLeafManager.getNodes(dofLeafPtrs);
+        mDofLeafManager.tree().getNodes(dofLeafPtrs);
         for (size_t i = 0; i < nLeaf; i++) {
             leafPtrToLeafposMap[dofLeafPtrs[i]] = i;
         }

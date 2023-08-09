@@ -1545,6 +1545,9 @@ void FLIP_Solver_OpenVDB::custom_move_points_and_set_flip_vel(
 	auto set_new_attribute_list = [&](const tbb::blocked_range<size_t>& r) {
 		using  namespace openvdb::tools::local_util;
 
+		using PosArrayType = openvdb::points::TypedAttributeArray<openvdb::Vec3f, FLIP_Object_OpenVDB::PositionCodec>;
+		using VelArrayType = openvdb::points::TypedAttributeArray<openvdb::Vec3f, FLIP_Object_OpenVDB::VelocityCodec>;
+
 		for (size_t leafpos = r.begin(); leafpos != r.end(); ++leafpos) {
 			auto& leaf = *new_particle_leaves[leafpos];
 			const auto& toffset_oidx_oleafpos_vec = *tuple_vec_raw_ptrs[leafpos];
@@ -1574,14 +1577,14 @@ void FLIP_Solver_OpenVDB::custom_move_points_and_set_flip_vel(
 				npar_to_be_filled[offset] = npar_to_be_filled[offset] - npar_to_be_filled[offset - 1];
 			}
 
+			auto posAttrPos = leaf.attributeSet().find("P");
+			auto vAttrPos = leaf.attributeSet().find("v");
+
 			//set the positions and velocities
 			//get the new attribute arrays
-			openvdb::points::AttributeArray& posarray = leaf.attributeArray("P");
-			openvdb::points::AttributeArray& varray = leaf.attributeArray("v");
 
-			// Create read handles for position and velocity
-			openvdb::points::AttributeWriteHandle<openvdb::Vec3f, FLIP_Object_OpenVDB::PositionCodec> posWHandle(posarray);
-			openvdb::points::AttributeWriteHandle<openvdb::Vec3f, FLIP_Object_OpenVDB::VelocityCodec> vWHandle(varray);
+			auto& posarray = PosArrayType::cast(leaf.attributeArray(posAttrPos));
+			auto& varray = VelArrayType::cast(leaf.attributeArray(vAttrPos));
 
 			openvdb::Vec3i pcoord;
 			int writing_offset;
@@ -1590,14 +1593,22 @@ void FLIP_Solver_OpenVDB::custom_move_points_and_set_flip_vel(
 			//move from the original leaves
 			int Npar = toffset_oidx_oleafpos_vec.size();
 			for (size_t i = 0; i < Npar; i++) {
-				writing_offset = toffset_oidx_oleafpos_vec[i].target_offset;
+				const auto& triplet = toffset_oidx_oleafpos_vec[i];
+				writing_offset = triplet.target_offset;
 				if (npar_to_be_filled[writing_offset] > 0) {
 					//potentially more than allowed particles want to be filled into the target voxel
 					//however they wont be allowed if it is already filled with sufficient amount
 					writer_index = leaf.getValue(writing_offset) - npar_to_be_filled[writing_offset];
 					npar_to_be_filled[writing_offset] = npar_to_be_filled[writing_offset] - 1;
-					posarray.set(writer_index, particle_leaves[toffset_oidx_oleafpos_vec[i].original_leaf_pos]->attributeArray("P"), toffset_oidx_oleafpos_vec[i].original_index);
-					varray.set(writer_index, particle_leaves[toffset_oidx_oleafpos_vec[i].original_leaf_pos]->attributeArray("v"), toffset_oidx_oleafpos_vec[i].original_index);
+					const auto& original_leaf = particle_leaves[triplet.original_leaf_pos];
+					posarray.set(writer_index, 
+								 PosArrayType::cast(original_leaf->attributeArray(posAttrPos)).
+								 get(triplet.original_index));
+					varray.set(writer_index,
+								 VelArrayType::cast(original_leaf->attributeArray(vAttrPos)).
+								 get(triplet.original_index));
+					//posarray.set(writer_index, particle_leaves[toffset_oidx_oleafpos_vec[i].original_leaf_pos]->attributeArray("P"), toffset_oidx_oleafpos_vec[i].original_index);
+					//varray.set(writer_index, particle_leaves[toffset_oidx_oleafpos_vec[i].original_leaf_pos]->attributeArray("v"), toffset_oidx_oleafpos_vec[i].original_index);
 				}
 			}//end for all recorded particles in this leaf
 		}//end for each new leaf
@@ -2939,7 +2950,7 @@ void FLIP_Solver_OpenVDB::sink_liquid(openvdb::points::PointDataGrid::Ptr in_out
 
 	std::vector<openvdb::points::PointDataTree::LeafNodeType*> leaves;
 	leaves.reserve(partman.leafCount());
-	partman.getNodes(leaves);
+	partman.tree().getNodes(leaves);
 
 	openvdb::Vec3d idx_domain_min = m_domain_index_begin - openvdb::Vec3d{ 0.5 },
 		idx_domain_max = m_domain_index_end - openvdb::Vec3d{ 0.5 };
